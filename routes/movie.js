@@ -60,4 +60,26 @@ router.get('/getmovie', (req, res) => {
 		});
 });
 
+//fetching avg rating
+router.post('/avgrating', (req, res) => {
+	const { title } = req.body;
+	Movie.find({ title })
+		.then((data) => {
+			let ratings = data[0].rating;
+			let sum = 0;
+			for (let i = 0; i < ratings.length; i++) {
+				sum += ratings[i];
+			}
+			let avg = sum / ratings.length;
+			res.send(
+				`The average rating for ${title} is ${avg.toPrecision(
+					2
+				)}`
+			);
+		})
+		.catch((err) => {
+			res.status(400).json({ error: err });
+		});
+});
+
 module.exports = router;

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const User = require('../models/User');
+const Movie = require('../models/Movies');
 
 //creating a user
 router.post('/register', (req, res) => {
@@ -11,6 +12,22 @@ router.post('/register', (req, res) => {
 		.catch((err) =>
 			res.status(400).json({ error: err })
 		);
+});
+
+//getting his fav movies
+router.get('/:id/getmovies', (req, res) => {
+	const { id } = req.params;
+	Movie.find({ userId: id })
+		.then((data) => {
+			let list = [];
+			for (let i = 0; i < data.length; i++) {
+				list.push(data[i].title);
+			}
+			res.send(`your fav movies are: ${list}`);
+		})
+		.catch((err) => {
+			res.status(400).json({ error: err });
+		});
 });
 
 module.exports = router;
