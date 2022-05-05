@@ -82,4 +82,46 @@ router.post('/avgrating', (req, res) => {
 		});
 });
 
+//updating a movie rating
+router.post(
+	'/:id/updatemovie',
+	async (req, res) => {
+		const { title, rating } = req.body;
+		const userId = req.params.id;
+		try {
+			const searchedMovie = await Movie.findOne({
+				title,
+			});
+			if (searchedMovie == null) {
+				return res
+					.status(400)
+					.json({ error: 'Movie not found' });
+			} else {
+				if (
+					searchedMovie.userId.includes(userId)
+				) {
+					tempMovie = searchedMovie;
+					tempMovie.rating.pop();
+					tempMovie.rating.push(rating);
+					tempMovie
+						.save()
+						.then((data) => res.json({ data }))
+						.catch((err) => {
+							res
+								.status(400)
+								.json({ error: err });
+						});
+				}
+				return res.status(400).json({
+					error:
+						'You do not have permission to update this movie',
+				});
+			}
+			// res.json(searchedMovie);
+		} catch (err) {
+			res.status(400).json({ error: err });
+		}
+	}
+);
+
 module.exports = router;
