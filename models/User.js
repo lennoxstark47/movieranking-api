@@ -19,6 +19,9 @@ const userSchema = new Schema({
 		required: true,
 		max: 10,
 	},
+	token : {
+		type: String,
+	}
 	// list: {
 	// 	type: Array,
 	// 	default: [],

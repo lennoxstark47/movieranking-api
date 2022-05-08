@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Movie = require('../models/Movies');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const verifyToken = require('../middleware/auth');
 
 router.post('/register', (req, res) => {
 	const { name, email, password, age } = req.body;
@@ -15,7 +16,9 @@ router.post('/register', (req, res) => {
 
 	newUser
 		.save()
-		.then((data) => res.json({ data }))
+		.then((user) => {
+			res.json({ user });
+		})
 		.catch((err) =>
 			res.status(400).json({ error: err })
 		);
@@ -38,6 +41,12 @@ router.post('/login', (req, res) => {
 					user.password
 				)
 			) {
+				const token = jwt.sign(
+					{ userId: user._id, email: user.email },
+					'secretkey',
+					{ expiresIn: '1h' }
+				);
+				user.token = token;
 				return res.json({ user });
 			}
 			return res
@@ -64,5 +73,13 @@ router.get('/:id/getmovies', (req, res) => {
 			res.status(400).json({ error: err });
 		});
 });
+
+router.get(
+	'/welcome',
+	verifyToken,
+	(req, res) => {
+		res.send('welcome');
+	}
+);
 
 module.exports = router;
